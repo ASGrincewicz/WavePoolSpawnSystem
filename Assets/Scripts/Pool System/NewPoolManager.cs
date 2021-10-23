@@ -26,7 +26,8 @@ namespace Grincewicz.PoolSystem
         {
             var pool = _pools[poolIndex].objectPool;
             var prefab = _pools[poolIndex].poolableObject;
-            var container = _pools[poolIndex].objectContainer;
+            var container = new GameObject($"{prefab.name}_container").transform;
+            container.SetParent(this.transform);
 
             for (int i = 0; i < amount; i++)
             {
@@ -62,11 +63,11 @@ namespace Grincewicz.PoolSystem
         /// <param name="pooledObject"></param>
         /// <param name="intialAmount"></param>
         /// <returns></returns>
-        public Pool CreateNewPool(int poolIndex, GameObject pooledObject, int intialAmount)
+        public Pool CreateNewPool(string poolName, int poolIndex, GameObject pooledObject, int intialAmount)
         {
             var container = new GameObject($"{pooledObject.name}_container").transform;
             Instantiate(container, transform);
-            var newPool = new Pool(pooledObject, container, intialAmount);
+            var newPool = new Pool(poolName, pooledObject, intialAmount);
             if (poolIndex !> _pools.Count - 1)
                 _pools[poolIndex] = newPool;
             else
@@ -78,7 +79,6 @@ namespace Grincewicz.PoolSystem
             for(int i = 0; i < _pools[poolIndex].objectPool.Count; i++)
             {
                 Destroy(_pools[poolIndex].objectPool[i]);
-                Destroy(_pools[poolIndex].objectContainer);
                 _pools.Remove(_pools[poolIndex]);
             }
         }
@@ -91,7 +91,6 @@ namespace Grincewicz.PoolSystem
         {
             var pool = _pools[poolIndex].objectPool;
             var prefab = _pools[poolIndex].poolableObject;
-            var container = _pools[poolIndex].objectContainer;
 
             for (int i = 0; i < pool.Count; i++)
             {
@@ -101,7 +100,7 @@ namespace Grincewicz.PoolSystem
                     return pool[i];
                 }
             }
-            GameObject newObject = Instantiate(prefab, container);
+            GameObject newObject = Instantiate(prefab);
             newObject.SetActive(true);
             pool.Add(newObject);
             return newObject;
@@ -113,20 +112,20 @@ namespace Grincewicz.PoolSystem
         /// <param name="objIndex"></param>
         /// <param name="container"></param>
         /// <returns></returns>
-        public GameObject RequestObject(List<GameObject> pool ,int objIndex,Transform container)
+        public GameObject RequestObject(List<GameObject> pool ,int index,Transform container)
         {
-            GameObject prefab = pool[objIndex];
-
-            if (!pool[objIndex].activeInHierarchy)
+            for(int i = index; i < pool.Count; i++)
             {
-                pool[objIndex].SetActive(true);
-                return prefab;
+                if (!pool[i].activeInHierarchy)
+                {
+                    GameObject prefab = pool[i];
+                    prefab.SetActive(true);
+                    return prefab;
+                }
             }
-            else
-            {
-                prefab = Instantiate(prefab, container);
-                return prefab;
-            }
+            pool[index] = Instantiate(pool[index], container);
+            return pool[index];
+            
         }
     }
 }

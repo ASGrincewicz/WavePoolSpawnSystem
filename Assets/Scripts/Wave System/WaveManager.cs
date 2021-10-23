@@ -9,12 +9,14 @@ namespace Grincewicz.WaveSystem
         public static WaveManager Instance { get => _instance; }
         
         [Tooltip("Use this for a continous sequence.")]
-        [SerializeField] private WaveSequenceAsset _firstWaveSequence;
+        [SerializeField] private List<WaveSequenceAsset> _waveSequences;
         [Tooltip("Use this list for standalone waves not in a sequence.")]
         [SerializeField] private List<WaveAsset> _singleWaves;
         [SerializeField] private int _currentWave = 0;
+        [SerializeField] private int _currentSequence = 0;
         public int CurrentWave { get => _currentWave; set => _currentWave = value; }
-        public WaveSequenceAsset FirstWaveSequence { get => _firstWaveSequence; }
+        public int CurrentSequence { get => _currentSequence; set => _currentSequence = value; }
+        public List<WaveSequenceAsset> WaveSequences { get => _waveSequences; }
 
         private void Awake() => _instance = this;
 
